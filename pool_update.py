@@ -368,12 +368,13 @@ def render(standings, teams, finish, scoring, meta, awards_for=None):
 <title>World Cup Draft Pool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{{--bg0:#0e0b1a;--bg1:#171130;--card:#1b1640;--card2:#181235;--line:#2c2556;
- --ink:#f4f1ff;--mut:#a79fc8;--gold:#ffd166;--green:#34e1b0;--pop:#ff5d8f}}
+ --ink:#f4f1ff;--mut:#a79fc8;--gold:#ffd166;--green:#34e1b0;--pop:#ff5d8f;
+ --display:'Barlow Condensed',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}}
 *{{box-sizing:border-box}}
-body{{margin:0;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+body{{margin:0;color:var(--ink);font-family:var(--display);font-size:18px;line-height:1.4;
  -webkit-font-smoothing:antialiased;
  background:radial-gradient(1200px 600px at 50% -10%,#241a4d 0%,var(--bg1) 40%,var(--bg0) 100%) fixed}}
 .wrap{{max-width:780px;margin:0 auto;padding:0 16px 64px}}
@@ -388,13 +389,13 @@ body{{margin:0;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFo
  animation:sheen 6s ease-in-out infinite}}
 @keyframes sheen{{0%,60%{{left:-30%}}100%{{left:130%}}}}
 .banner .in{{position:relative;z-index:1}}
-.eyebrow{{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
- color:rgba(255,255,255,.82);margin:0 0 6px}}
-h1{{font-family:Anton,sans-serif;font-weight:400;letter-spacing:.01em;line-height:.94;
- font-size:clamp(34px,9vw,60px);margin:0;text-shadow:0 2px 18px rgba(0,0,0,.35)}}
+.eyebrow{{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
+ color:rgba(255,255,255,.82);margin:0 0 8px}}
+h1{{font-family:var(--display);font-weight:800;letter-spacing:.005em;line-height:.9;text-transform:uppercase;
+ font-size:clamp(46px,12vw,80px);margin:0;text-shadow:0 2px 18px rgba(0,0,0,.35)}}
 h1 .yr{{color:var(--gold)}}
-.strip{{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:14px;
- font-size:12.5px;color:rgba(255,255,255,.9)}}
+.strip{{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px;
+ font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.9)}}
 .strip .dot{{width:7px;height:7px;border-radius:50%;background:var(--green);
  box-shadow:0 0 0 4px rgba(52,225,176,.18);display:inline-block;margin-right:6px;vertical-align:middle}}
 
@@ -402,50 +403,53 @@ h1 .yr{{color:var(--gold)}}
 .card{{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
  border-radius:14px;margin-bottom:10px;overflow:hidden;transition:transform .12s ease,border-color .12s ease}}
 .card:hover{{transform:translateY(-1px);border-color:#3a3270}}
-summary{{list-style:none;cursor:pointer;display:grid;grid-template-columns:30px 44px 1fr auto;
- gap:12px;align-items:center;padding:13px 16px}}
+summary{{list-style:none;cursor:pointer;display:grid;grid-template-columns:34px 48px 1fr auto;
+ gap:13px;align-items:center;padding:14px 16px}}
 summary::-webkit-details-marker{{display:none}}
-.pos{{font-family:Anton,sans-serif;font-size:20px;color:var(--mut);text-align:center}}
-.ava{{width:44px;height:44px;border-radius:50%;object-fit:cover;display:grid;place-items:center;
+.pos{{font-family:var(--display);font-weight:800;font-size:26px;color:var(--mut);text-align:center}}
+.ava{{width:46px;height:46px;border-radius:50%;object-fit:cover;display:grid;place-items:center;
  border:2px solid #34306a}}
-.ava-i{{font-weight:800;font-size:15px;color:#fff;letter-spacing:.02em}}
+.ava-i{{font-family:var(--display);font-weight:800;font-size:19px;color:#fff;letter-spacing:.02em}}
 .who{{min-width:0}}
-.nm{{display:block;font-weight:700;font-size:16px;line-height:1.2;
+.nm{{display:block;font-weight:700;font-size:23px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.kit{{display:flex;gap:4px;margin-top:5px}}
-.kf{{width:21px;height:15px;border-radius:3px;object-fit:cover;background:#2c2556;
+.kit{{display:flex;gap:4px;margin-top:6px}}
+.kf{{width:24px;height:17px;border-radius:3px;object-fit:cover;background:#2c2556;
  box-shadow:0 1px 2px rgba(0,0,0,.4)}}
 .kf.noflag{{display:inline-block}}
 .tot{{text-align:right;line-height:1}}
-.tot b{{font-family:Anton,sans-serif;font-weight:400;font-size:26px;display:block}}
-.tot i{{font-style:normal;font-size:9.5px;letter-spacing:.16em;color:var(--mut)}}
+.tot b{{font-family:var(--display);font-weight:800;font-size:34px;display:block}}
+.tot i{{font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.18em;color:var(--mut)}}
 
 .rank-1{{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 8px 30px -12px rgba(255,209,102,.5)}}
-.rank-1 .pos{{font-size:22px}}
+.rank-1 .pos{{font-size:28px}}
 .rank-1 .tot b{{color:var(--gold)}}
 .rank-2{{border-color:#9fb0c9}} .rank-2 .tot b{{color:#cfd8e6}}
 .rank-3{{border-color:#c08457}} .rank-3 .tot b{{color:#e0a173}}
 
 /* ---- expanded team table ---- */
 table.teams{{width:100%;border-collapse:collapse;border-top:1px solid var(--line)}}
-table.teams th{{text-align:left;color:var(--mut);font-weight:600;font-size:10.5px;
- text-transform:uppercase;letter-spacing:.05em;padding:8px 16px}}
-table.teams td{{padding:9px 16px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums;font-size:13.5px}}
-.tmwrap{{display:flex;align-items:center;gap:9px;font-weight:600}}
-.flag{{width:22px;height:16px;border-radius:3px;object-fit:cover;background:#2c2556;flex:none}}
+table.teams th{{text-align:left;font-family:var(--mono);color:var(--mut);font-weight:500;font-size:11px;
+ text-transform:uppercase;letter-spacing:.08em;padding:9px 16px}}
+table.teams td{{padding:10px 16px;border-top:1px solid var(--line);font-size:17px}}
+.tmwrap{{display:flex;align-items:center;gap:10px;font-weight:600;text-transform:uppercase;letter-spacing:.01em}}
+.flag{{width:24px;height:17px;border-radius:3px;object-fit:cover;background:#2c2556;flex:none}}
 .flag.noflag{{display:inline-block}}
-td.rec,td.gd{{color:var(--mut)}}
-td.st{{color:var(--mut);font-size:12px}} td.pt{{text-align:right;font-weight:800}}
+td.rec,td.gd,td.pt{{font-family:var(--mono);font-variant-numeric:tabular-nums}}
+td.rec,td.gd{{color:var(--mut);font-size:13px}}
+td.st{{font-family:var(--mono);color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.03em}}
+td.pt{{text-align:right;font-weight:700;font-size:15px}}
 th:nth-child(2),th:nth-child(3),th:nth-child(5),
 td.rec,td.gd,td.pt{{text-align:right}}
 th:first-child,td.tm{{text-align:left}}
 
-.key{{margin-top:24px;color:var(--mut);font-size:11.5px;line-height:1.7;
+.key{{margin-top:24px;font-family:var(--mono);color:var(--mut);font-size:12px;line-height:1.8;
  border-top:1px solid var(--line);padding-top:16px}}
 .key b{{color:var(--ink)}}
 @media (max-width:480px){{
-  summary{{grid-template-columns:24px 40px 1fr auto;gap:10px}}
-  .ava{{width:40px;height:40px}}
+  summary{{grid-template-columns:28px 44px 1fr auto;gap:11px}}
+  .ava{{width:44px;height:44px}}
+  .nm{{font-size:21px}}
 }}
 @media (prefers-reduced-motion:reduce){{.banner::after{{animation:none;display:none}}.card{{transition:none}}}}
 </style></head><body>
