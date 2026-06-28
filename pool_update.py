@@ -100,13 +100,13 @@ AVATARS = {
 
 # Custom top banner: put an image in your repo (e.g. "banner.jpg") and name it
 # here. Use a WIDE / horizontal image. Leave "" for the built-in gradient banner.
-BANNER_IMAGE = "banner.jpg"
+BANNER_IMAGE = ""
 
 # Full-bleed background art behind everything (e.g. your bracket image with an
 # empty middle — the leaderboard sits over the empty center, the art shows in the
 # left/right margins). Center is darkened for readability, edges stay bright.
 # Leave "" for the plain dark gradient.
-BACKGROUND_IMAGE = "bracket.png"
+BACKGROUND_IMAGE = ""
 
 # ----------------------------------------------------------------------------
 # ESPN plumbing
@@ -436,7 +436,7 @@ body{{margin:0;color:var(--ink);font-family:var(--display);font-size:18px;line-h
    rgba(14,11,26,.82) 0%,rgba(14,11,26,.80) 38%,rgba(14,11,26,.30) 100%)}}
 
 /* ---- banner ---- */
-.banner{{position:relative;z-index:1;margin:0 -16px 22px;padding:40px 24px 30px;overflow:hidden;
+.banner{{position:relative;z-index:1;margin:0 -16px 22px;padding:40px 24px 50px;overflow:hidden;
  background:linear-gradient(115deg,#3a1d6e 0%,#5b2a86 38%,#1f7a6b 100%)}}
 .banner::before{{content:"";position:absolute;inset:0;opacity:.16;
  background:repeating-linear-gradient(115deg,#fff 0 2px,transparent 2px 22px)}}
@@ -448,7 +448,7 @@ body{{margin:0;color:var(--ink);font-family:var(--display);font-size:18px;line-h
 .eyebrow{{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
  color:rgba(255,255,255,.82);margin:0 0 8px}}
 h1{{font-family:var(--display);font-weight:800;letter-spacing:.005em;line-height:.9;text-transform:uppercase;
- font-size:clamp(46px,12vw,80px);margin:0;text-shadow:0 2px 18px rgba(0,0,0,.35)}}
+ font-size:clamp(52px,13.5vw,96px);margin:0;text-shadow:0 2px 18px rgba(0,0,0,.35)}}
 h1 .yr{{color:var(--gold)}}
 .strip{{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px;
  font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.92)}}
