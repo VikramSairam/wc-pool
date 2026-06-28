@@ -99,8 +99,14 @@ AVATARS = {
 }
 
 # Custom top banner: put an image in your repo (e.g. "banner.jpg") and name it
-# here. Leave "" to use the built-in gradient banner.
+# here. Use a WIDE / horizontal image. Leave "" for the built-in gradient banner.
 BANNER_IMAGE = ""
+
+# Full-bleed background art behind everything (e.g. your bracket image with an
+# empty middle — the leaderboard sits over the empty center, the art shows in the
+# left/right margins). Center is darkened for readability, edges stay bright.
+# Leave "" for the plain dark gradient.
+BACKGROUND_IMAGE = ""
 
 # ----------------------------------------------------------------------------
 # ESPN plumbing
@@ -402,6 +408,10 @@ def render(standings, teams, finish, scoring, meta, awards_for=None, avatar_file
                     f'url({html.escape(banner_src)});background-size:cover;background-position:center"'
                     if banner_src else "")
 
+    bg_src = (BACKGROUND_IMAGE if BACKGROUND_IMAGE.startswith("http")
+              else os.path.basename(BACKGROUND_IMAGE) if BACKGROUND_IMAGE else "")
+    pagebg_attr = f' style="background-image:url({html.escape(bg_src)})"' if bg_src else ""
+
     return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>World Cup Draft Pool</title>
@@ -416,10 +426,17 @@ def render(standings, teams, finish, scoring, meta, awards_for=None, avatar_file
 body{{margin:0;color:var(--ink);font-family:var(--display);font-size:18px;line-height:1.4;
  -webkit-font-smoothing:antialiased;
  background:radial-gradient(1200px 600px at 50% -10%,#241a4d 0%,var(--bg1) 40%,var(--bg0) 100%) fixed}}
-.wrap{{max-width:780px;margin:0 auto;padding:0 16px 64px}}
+.wrap{{max-width:780px;margin:0 auto;padding:0 16px 64px;position:relative;z-index:1}}
+
+/* ---- full-bleed background art (bracket) ---- */
+.pagebg{{position:fixed;inset:0;z-index:0;background-position:center;background-repeat:no-repeat;
+ background-size:cover}}
+.pagebg::after{{content:"";position:absolute;inset:0;
+ background:radial-gradient(ellipse 62% 92% at 50% 46%,
+   rgba(14,11,26,.82) 0%,rgba(14,11,26,.80) 38%,rgba(14,11,26,.30) 100%)}}
 
 /* ---- banner ---- */
-.banner{{position:relative;margin:0 -16px 22px;padding:40px 24px 30px;overflow:hidden;
+.banner{{position:relative;z-index:1;margin:0 -16px 22px;padding:40px 24px 30px;overflow:hidden;
  background:linear-gradient(115deg,#3a1d6e 0%,#5b2a86 38%,#1f7a6b 100%)}}
 .banner::before{{content:"";position:absolute;inset:0;opacity:.16;
  background:repeating-linear-gradient(115deg,#fff 0 2px,transparent 2px 22px)}}
@@ -442,13 +459,13 @@ h1 .yr{{color:var(--gold)}}
 .card{{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
  border-radius:14px;margin-bottom:10px;overflow:hidden;transition:transform .12s ease,border-color .12s ease}}
 .card:hover{{transform:translateY(-1px);border-color:#3a3270}}
-summary{{list-style:none;cursor:pointer;display:grid;grid-template-columns:34px 48px 1fr auto;
- gap:13px;align-items:center;padding:14px 16px}}
+summary{{list-style:none;cursor:pointer;display:grid;grid-template-columns:34px 60px 1fr auto;
+ gap:14px;align-items:center;padding:14px 16px}}
 summary::-webkit-details-marker{{display:none}}
 .pos{{font-family:var(--display);font-weight:800;font-size:26px;color:var(--mut);text-align:center}}
-.ava{{width:46px;height:46px;border-radius:50%;object-fit:cover;display:grid;place-items:center;
+.ava{{width:58px;height:58px;border-radius:50%;object-fit:cover;display:grid;place-items:center;
  border:2px solid #34306a}}
-.ava-i{{font-family:var(--display);font-weight:800;font-size:19px;color:#fff;letter-spacing:.02em}}
+.ava-i{{font-family:var(--display);font-weight:800;font-size:24px;color:#fff;letter-spacing:.02em}}
 .who{{min-width:0}}
 .nm{{display:block;font-weight:700;font-size:23px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;
  overflow-wrap:anywhere}}
@@ -490,15 +507,16 @@ th:first-child,td.tm{{text-align:left}}
 .scorebox>summary::-webkit-details-marker{{display:none}}
 .scorebox .chev{{font-size:14px;color:var(--mut);transition:transform .15s ease}}
 .scorebox[open] .chev{{transform:rotate(180deg)}}
-.keybody{{font-family:var(--mono);color:var(--mut);font-size:12px;line-height:1.85;
+.keybody{{font-family:var(--mono);color:var(--mut);font-size:14px;font-weight:700;line-height:1.75;
  text-transform:uppercase;letter-spacing:.03em;padding:2px 18px 18px;border-top:1px solid var(--line)}}
 @media (max-width:480px){{
-  summary{{grid-template-columns:28px 44px 1fr auto;gap:11px}}
-  .ava{{width:44px;height:44px}}
+  summary{{grid-template-columns:30px 52px 1fr auto;gap:12px}}
+  .ava{{width:52px;height:52px}}
   .nm{{font-size:21px}}
 }}
 @media (prefers-reduced-motion:reduce){{.banner::after{{animation:none;display:none}}.card{{transition:none}}}}
 </style></head><body>
+<div class="pagebg"{pagebg_attr}></div>
 <div class="banner"{banner_style}>
   <div class="in">
     <h1><span class="yr">2026</span> FIFA WORLD CUP<br>DRAFT POOL</h1>
@@ -580,12 +598,13 @@ def main():
     with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(build(matches, std_finish, std_flags, avatar_files))
 
-    # copy a local banner image, if one is set
-    if BANNER_IMAGE and not BANNER_IMAGE.startswith("http"):
-        src_b = os.path.join(base, BANNER_IMAGE)
-        if os.path.isfile(src_b):
-            shutil.copy(src_b, os.path.join(out_dir, os.path.basename(BANNER_IMAGE)))
-            print("  Copied banner image into the site.")
+    # copy custom images (top banner + full-bleed background), if set
+    for img in (BANNER_IMAGE, BACKGROUND_IMAGE):
+        if img and not img.startswith("http"):
+            src_b = os.path.join(base, img)
+            if os.path.isfile(src_b):
+                shutil.copy(src_b, os.path.join(out_dir, os.path.basename(img)))
+                print(f"  Copied {os.path.basename(img)} into the site.")
     print(f"  Wrote {out_dir}/index.html")
 
 if __name__ == "__main__":
