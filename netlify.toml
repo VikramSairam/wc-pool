@@ -1,0 +1,5 @@
+# Tells Netlify how to build the pool site: run the Python script,
+# then publish the folder it creates. No settings to type in the UI.
+[build]
+  command = "python3 pool_update.py"
+  publish = "pool-site"
