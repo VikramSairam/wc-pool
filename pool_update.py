@@ -22,18 +22,18 @@ from collections import defaultdict
 #    name it can't find so you can fix it (see ALIASES below for quick remaps).
 # ============================================================================
 DRAFT = {
-    "Daniel":    ["France", "Egypt", "Sweden", "Haiti"],
-    "Antonio":   ["Spain", "Senegal", "Scotland", "Panama"],
-    "Joe":       ["England", "Turkey", "Austria", "Iraq"],
-    "Mario":     ["Argentina", "Uruguay", "Canada", "DR Congo"],
-    "Bennett":   ["Germany", "Switzerland", "Ivory Coast", "Uzbekistan"],
-    "Ryan":      ["Brazil", "United States", "Algeria", "Jordan"],
-    "Vik":       ["Portugal", "Ecuador", "Ghana", "Cape Verde"],
-    "Paul":      ["Netherlands", "Bosnia & Herzegovina", "Curacao", "South Africa"],
-    "Mad Max":   ["Morocco", "Mexico", "Czechia", "New Zealand"],
-    "Jack S":    ["Colombia", "Japan", "Qatar", "Saudi Arabia"],
-    "J Kim":     ["Croatia", "South Korea", "Paraguay", "Tunisia"],
-    "Matty Ice": ["Belgium", "Norway", "Australia", "Iran"],
+    "Daniel (G.O.A.T.)":          ["France", "Egypt", "Sweden", "Haiti"],
+    "Wantonio":                   ["Spain", "Senegal", "Scotland", "Panama"],
+    "Tik Tok Joe":                ["England", "Turkey", "Austria", "Iraq"],
+    "Mario Armando Leal Verdugo": ["Argentina", "Uruguay", "Canada", "DR Congo"],
+    "BP, Twin, Oil Spill":        ["Germany", "Switzerland", "Ivory Coast", "Uzbekistan"],
+    "Young Man":                  ["Brazil", "United States", "Algeria", "Jordan"],
+    "Vikinho":                    ["Portugal", "Ecuador", "Ghana", "Cape Verde"],
+    "Paul Benzino":               ["Netherlands", "Bosnia & Herzegovina", "Curacao", "South Africa"],
+    "Mad Max":                    ["Morocco", "Mexico", "Czechia", "New Zealand"],
+    "Jack S":                     ["Colombia", "Japan", "Qatar", "Saudi Arabia"],
+    "J Kim":                      ["Croatia", "South Korea", "Paraguay", "Tunisia"],
+    "Matty Ice":                  ["Belgium", "Norway", "Australia", "Iran"],
 }
 
 # ============================================================================
@@ -79,12 +79,23 @@ ALIASES = {
 # ============================================================================
 # 3. LOOK & FEEL (all optional — leave as-is and it still looks good)
 # ============================================================================
-# Headshots: drop image files into an `avatars/` folder in your repo, then map
-# each person to their filename. Anyone without a photo gets a colored initials
-# circle automatically, so you can add photos one at a time, whenever.
+# Headshots: put image files in an `avatars/` folder in your repo. Each photo's
+# filename (without the extension) should match the basename below. The extension
+# can be .jpg/.jpeg/.png/.webp — the script finds whichever you used. Anyone
+# without a photo keeps their colored initials circle.
 AVATARS = {
-    # "Vik":    "vik.jpg",
-    # "Daniel": "daniel.png",
+    "Daniel (G.O.A.T.)":          "daniel",
+    "Wantonio":                   "wantonio",
+    "Tik Tok Joe":                "joe",
+    "Mario Armando Leal Verdugo": "mario",
+    "BP, Twin, Oil Spill":        "bp",
+    "Young Man":                  "youngman",
+    "Vikinho":                    "vikinho",
+    "Paul Benzino":               "paul",
+    "Mad Max":                    "madmax",
+    "Jack S":                     "jacks",
+    "J Kim":                      "jkim",
+    "Matty Ice":                  "mattyice",
 }
 
 # Custom top banner: put an image in your repo (e.g. "banner.jpg") and name it
@@ -309,17 +320,45 @@ def flag_img(url, cls="flag"):
         return f'<img class="{cls}" src="{html.escape(url)}" alt="" loading="lazy">'
     return f'<span class="{cls} noflag"></span>'
 
-def avatar_html(person):
-    fname = AVATARS.get(person)
-    if fname:
-        return f'<img class="ava" src="avatars/{html.escape(fname)}" alt="">'
-    initials = "".join(w[0] for w in person.split()[:2]).upper() or "?"
+def avatar_html(person, avatar_files=None):
+    src = (avatar_files or {}).get(person)
+    if src:
+        return f'<img class="ava" src="{html.escape(src)}" alt="">'
+    words = [re.sub(r"[^A-Za-z0-9]", "", w) for w in person.split()]
+    words = [w for w in words if w]
+    if len(words) >= 2:
+        initials = (words[0][0] + words[1][0]).upper()
+    elif words:
+        initials = words[0][:2].upper()
+    else:
+        initials = "?"
     hue = sum(ord(c) for c in person) % 360
     return (f'<span class="ava ava-i" style="background:linear-gradient(135deg,'
             f'hsl({hue} 62% 46%),hsl({(hue+45) % 360} 60% 36%))">{html.escape(initials)}</span>')
 
-def render(standings, teams, finish, scoring, meta, awards_for=None):
+def resolve_avatars(avatars_dir):
+    """Match each manager to a real image file in avatars_dir, trying the basename
+    in AVATARS first, then a slug of the manager's name, across common extensions."""
+    out = {}
+    if not os.path.isdir(avatars_dir):
+        return out
+    have = {f.lower(): f for f in os.listdir(avatars_dir)}
+    exts = (".jpg", ".jpeg", ".png", ".webp", ".gif")
+    for person in DRAFT:
+        candidates = []
+        if AVATARS.get(person):
+            candidates.append(AVATARS[person].lower())
+        candidates.append(re.sub(r"[^a-z0-9]", "", person.lower()))  # name slug fallback
+        for base in candidates:
+            hit = next((have[base + e] for e in exts if base + e in have), None)
+            if hit:
+                out[person] = "avatars/" + hit
+                break
+    return out
+
+def render(standings, teams, finish, scoring, meta, awards_for=None, avatar_files=None):
     awards_for = awards_for or {}
+    avatar_files = avatar_files or {}
     esc = html.escape
     rows = ""
     for rank, (person, pts, tdetail, agg) in enumerate(standings, 1):
@@ -339,7 +378,7 @@ def render(standings, teams, finish, scoring, meta, awards_for=None):
         <details class="card {medal}">
           <summary>
             <span class="pos">{marker}</span>
-            {avatar_html(person)}
+            {avatar_html(person, avatar_files)}
             <span class="who"><span class="nm">{esc(person)}</span><span class="kit">{kit}</span></span>
             <span class="tot"><b>{pts}</b><i>PTS</i></span>
           </summary>
@@ -368,7 +407,7 @@ def render(standings, teams, finish, scoring, meta, awards_for=None):
 <title>World Cup Draft Pool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{{--bg0:#0e0b1a;--bg1:#171130;--card:#1b1640;--card2:#181235;--line:#2c2556;
  --ink:#f4f1ff;--mut:#a79fc8;--gold:#ffd166;--green:#34e1b0;--pop:#ff5d8f;
@@ -395,7 +434,7 @@ h1{{font-family:var(--display);font-weight:800;letter-spacing:.005em;line-height
  font-size:clamp(46px,12vw,80px);margin:0;text-shadow:0 2px 18px rgba(0,0,0,.35)}}
 h1 .yr{{color:var(--gold)}}
 .strip{{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px;
- font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.9)}}
+ font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.92)}}
 .strip .dot{{width:7px;height:7px;border-radius:50%;background:var(--green);
  box-shadow:0 0 0 4px rgba(52,225,176,.18);display:inline-block;margin-right:6px;vertical-align:middle}}
 
@@ -412,7 +451,7 @@ summary::-webkit-details-marker{{display:none}}
 .ava-i{{font-family:var(--display);font-weight:800;font-size:19px;color:#fff;letter-spacing:.02em}}
 .who{{min-width:0}}
 .nm{{display:block;font-weight:700;font-size:23px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;
- white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+ overflow-wrap:anywhere}}
 .kit{{display:flex;gap:4px;margin-top:6px}}
 .kf{{width:24px;height:17px;border-radius:3px;object-fit:cover;background:#2c2556;
  box-shadow:0 1px 2px rgba(0,0,0,.4)}}
@@ -443,9 +482,16 @@ th:nth-child(2),th:nth-child(3),th:nth-child(5),
 td.rec,td.gd,td.pt{{text-align:right}}
 th:first-child,td.tm{{text-align:left}}
 
-.key{{margin-top:24px;font-family:var(--mono);color:var(--mut);font-size:12px;line-height:1.8;
- border-top:1px solid var(--line);padding-top:16px}}
-.key b{{color:var(--ink)}}
+.scorebox{{margin-top:22px;background:linear-gradient(180deg,var(--card),var(--card2));
+ border:1px solid var(--line);border-radius:14px;overflow:hidden}}
+.scorebox>summary{{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+ padding:15px 18px;font-family:var(--display);font-weight:800;font-size:20px;
+ text-transform:uppercase;letter-spacing:.04em;color:var(--gold)}}
+.scorebox>summary::-webkit-details-marker{{display:none}}
+.scorebox .chev{{font-size:14px;color:var(--mut);transition:transform .15s ease}}
+.scorebox[open] .chev{{transform:rotate(180deg)}}
+.keybody{{font-family:var(--mono);color:var(--mut);font-size:12px;line-height:1.85;
+ text-transform:uppercase;letter-spacing:.03em;padding:2px 18px 18px;border-top:1px solid var(--line)}}
 @media (max-width:480px){{
   summary{{grid-template-columns:28px 44px 1fr auto;gap:11px}}
   .ava{{width:44px;height:44px}}
@@ -455,8 +501,7 @@ th:first-child,td.tm{{text-align:left}}
 </style></head><body>
 <div class="banner"{banner_style}>
   <div class="in">
-    <p class="eyebrow">The Group Chat Cup</p>
-    <h1>WORLD CUP <span class="yr">2026</span><br>DRAFT POOL</h1>
+    <h1><span class="yr">2026</span> FIFA WORLD CUP<br>DRAFT POOL</h1>
     <div class="strip"><span><span class="dot"></span>Updated {esc(meta['updated'])}</span>
       <span>·</span><span>{meta['done']} matches counted</span>
       <span>·</span><span>tap a manager to see their squad</span></div>
@@ -464,13 +509,17 @@ th:first-child,td.tm{{text-align:left}}
 </div>
 <div class="wrap">
 {rows}
-<div class="key"><b>Scoring</b> &nbsp; {key}</div>
+<details class="scorebox">
+  <summary>Scoring<span class="chev">▾</span></summary>
+  <div class="keybody">{key}</div>
+</details>
 </div></body></html>"""
 
 # ----------------------------------------------------------------------------
-def build(matches, std_finish=None, std_flags=None):
+def build(matches, std_finish=None, std_flags=None, avatar_files=None):
     std_finish = std_finish or {}
     std_flags = std_flags or {}
+    avatar_files = avatar_files or {}
     teams, sb_finish = compute(matches, SCORING)
     # Prefer ESPN's standings ranking; fall back to the table computed from matches.
     finish = std_finish if std_finish else sb_finish
@@ -507,7 +556,7 @@ def build(matches, std_finish=None, std_flags=None):
 
     done = sum(1 for m in matches if m["completed"] and m["round"] != "third")
     meta = {"updated": datetime.datetime.now().strftime("%b %-d, %Y · %-I:%M %p"), "done": done}
-    return render(standings, teams, finish, SCORING, meta, awards_for)
+    return render(standings, teams, finish, SCORING, meta, awards_for, avatar_files)
 
 def main():
     print("Pulling World Cup matches from ESPN…")
@@ -519,13 +568,18 @@ def main():
     base = os.path.dirname(os.path.abspath(__file__))
     out_dir = os.path.join(base, "pool-site")
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
-        f.write(build(matches, std_finish, std_flags))
-    # copy headshots, if any, into the published folder
+
+    # copy headshots (if any) into the published folder FIRST, then match them
     src_av = os.path.join(base, "avatars")
     if os.path.isdir(src_av):
         shutil.copytree(src_av, os.path.join(out_dir, "avatars"), dirs_exist_ok=True)
-        print("  Copied avatars/ into the site.")
+    avatar_files = resolve_avatars(os.path.join(out_dir, "avatars"))
+    if avatar_files:
+        print(f"  Matched {len(avatar_files)} headshot(s): {', '.join(avatar_files)}")
+
+    with open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(build(matches, std_finish, std_flags, avatar_files))
+
     # copy a local banner image, if one is set
     if BANNER_IMAGE and not BANNER_IMAGE.startswith("http"):
         src_b = os.path.join(base, BANNER_IMAGE)
