@@ -106,7 +106,7 @@ BANNER_IMAGE = "banner.jpg"
 # empty middle — the leaderboard sits over the empty center, the art shows in the
 # left/right margins). Center is darkened for readability, edges stay bright.
 # Leave "" for the plain dark gradient.
-BACKGROUND_IMAGE = "bracket.jpg"
+BACKGROUND_IMAGE = "bracket.png"
 
 # ----------------------------------------------------------------------------
 # ESPN plumbing
