@@ -100,13 +100,13 @@ AVATARS = {
 
 # Custom top banner: put an image in your repo (e.g. "banner.jpg") and name it
 # here. Use a WIDE / horizontal image. Leave "" for the built-in gradient banner.
-BANNER_IMAGE = ""
+BANNER_IMAGE = "banner.jpg"
 
 # Full-bleed background art behind everything (e.g. your bracket image with an
 # empty middle — the leaderboard sits over the empty center, the art shows in the
 # left/right margins). Center is darkened for readability, edges stay bright.
 # Leave "" for the plain dark gradient.
-BACKGROUND_IMAGE = ""
+BACKGROUND_IMAGE = "bracket.png"
 
 # ----------------------------------------------------------------------------
 # ESPN plumbing
