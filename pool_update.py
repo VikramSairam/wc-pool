@@ -68,7 +68,7 @@ ALIASES = {
     "Congo DR": "DR Congo",
     "Côte d'Ivoire": "Ivory Coast",
     "Cabo Verde": "Cape Verde",
-    "Bosnia and Herzegovina": "Bosnia & Herzegovina",
+    "Bosnia-Herzegovina": "Bosnia & Herzegovina",
     "Curaçao": "Curacao",
     "Korea Republic": "South Korea",
     "Czech Republic": "Czechia",
