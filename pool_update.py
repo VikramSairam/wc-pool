@@ -426,7 +426,7 @@ def render(standings, teams, finish, scoring, meta, awards_for=None, avatar_file
 body{{margin:0;color:var(--ink);font-family:var(--display);font-size:18px;line-height:1.4;
  -webkit-font-smoothing:antialiased;
  background:radial-gradient(1200px 600px at 50% -10%,#241a4d 0%,var(--bg1) 40%,var(--bg0) 100%) fixed}}
-.wrap{{max-width:780px;margin:0 auto;padding:0 16px 64px;position:relative;z-index:1}}
+.wrap{{max-width:1040px;margin:0 auto;padding:0 16px 64px;position:relative;z-index:1}}
 
 /* ---- full-bleed background art (bracket) ---- */
 .pagebg{{position:fixed;inset:0;z-index:0;background-position:center;background-repeat:no-repeat;
@@ -513,6 +513,9 @@ th:first-child,td.tm{{text-align:left}}
   summary{{grid-template-columns:30px 52px 1fr auto;gap:12px}}
   .ava{{width:52px;height:52px}}
   .nm{{font-size:21px}}
+}}
+@media (min-width:800px){{
+  table.teams td,.tmwrap{{white-space:nowrap}}
 }}
 @media (prefers-reduced-motion:reduce){{.banner::after{{animation:none;display:none}}.card{{transition:none}}}}
 </style></head><body>
